@@ -2,10 +2,15 @@
 
 spawn = (require 'child_process').spawn
 
+stamp = (achild) ->
+    achild.seq += 1
+    return [achild.seq, (new Date()).toISOString()]
+
 child = spawn 'ls', ['-hitlr', '.', 'foo']
+child.seq = 0
 child.stdout.on 'data', (data) ->
-  console.log 'stdout: ' + data
+  console.log stamp(child) + ' stdout: ' + data
 child.stderr.on 'data', (data) ->
-  console.log 'stderr: ' + data
+  console.log stamp(child) + ' stderr: ' + data
 child.on 'exit', (code) ->
-  console.log 'exit status: ' + code
+  console.log stamp(child) + ' exit status: ' + code
