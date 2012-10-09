@@ -1,0 +1,11 @@
+#!/usr/bin/env coffee
+
+spawn = (require 'child_process').spawn
+
+child = spawn 'ls', ['-hitlr', '.', 'foo']
+child.stdout.on 'data', (data) ->
+  console.log 'stdout: ' + data
+child.stderr.on 'data', (data) ->
+  console.log 'stderr: ' + data
+child.on 'exit', (code) ->
+  console.log 'exit status: ' + code
