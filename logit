@@ -2,12 +2,19 @@
 
 spawn = (require 'child_process').spawn
 
+# Return a sequence number and timestamp for a child process.
+# *achild.seq* is assumed to be already initialised (to 0, when
+# the process is created).
+# A list of [seq, string] is returned.
 stamp = (achild) ->
     achild.seq += 1
     return [achild.seq, (new Date()).toISOString()]
 
-child = spawn 'ls', ['-hitlr', '.', 'foo']
+command = process.argv[2]
+child_arguments = process.argv[3..]
+child = spawn command, child_arguments
 child.seq = 0
+console.log stamp(child) + ' start: ' + [command]+child_arguments
 child.stdout.on 'data', (data) ->
   console.log stamp(child) + ' stdout: ' + data
 child.stderr.on 'data', (data) ->
