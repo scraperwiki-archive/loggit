@@ -11,6 +11,11 @@ stamp = (achild) ->
     return [achild.seq, (new Date()).toISOString()]
 
 log = (child, ev) ->
+    """Log an event (which is a structured object).  There are
+    currently 4 type (start, stdout, stderr, exit).
+    Currently it just prints them to console.log.
+    """
+    # :todo: in future, write to some sort of DB.
     if ev.type == 'start'
         console.log stamp(child) + ' pid: ' + ev.pid +
           ' start: ' + ev.command_line
