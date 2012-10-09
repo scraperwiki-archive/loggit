@@ -10,16 +10,29 @@ stamp = (achild) ->
     achild.seq += 1
     return [achild.seq, (new Date()).toISOString()]
 
+log = (child, ev) ->
+    if ev.type == 'start'
+        console.log stamp(child) + ' pid: ' + ev.pid +
+          ' start: ' + ev.command_line
+    if ev.type == 'stdout' or ev.type == 'stderr'
+        console.log stamp(child) + ' ' + ev.type + ': ' +
+          ev.data
+    if ev.type == 'exit'
+        console.log stamp(child) + ' exit status: ' + ev.status +
+          ' signal: ' + ev.signal
+
 command = process.argv[2]
 child_arguments = process.argv[3..]
 child = spawn command, child_arguments
 child.seq = 0
-console.log stamp(child) +
-  ' start: ' + [command].concat(child_arguments)
+log child,
+    'type': 'start'
+    pid: child.pid
+    command_line: [command].concat(child_arguments)
+          
 child.stdout.on 'data', (data) ->
-  console.log stamp(child) + ' stdout: ' + data
+  log child, { type: 'stdout', data: data }
 child.stderr.on 'data', (data) ->
-  console.log stamp(child) + ' stderr: ' + data
+  log child, { type: 'stderr', data: data }
 child.on 'exit', (code, signal) ->
-  console.log stamp(child) + ' exit status: ' + code +
-    ' signal: ' + signal
+  log child, { type: 'exit', status: code, signal: signal }
