@@ -1,6 +1,6 @@
 #!/usr/bin/env coffee
 
-"""logit command ...
+"""loggit command ...
 
 Tool for logging output of a command to a sqlite database.
 """
@@ -8,14 +8,14 @@ Tool for logging output of a command to a sqlite database.
 spawn = (require 'child_process').spawn
 
 sqlite3 = (require 'sqlite3').verbose()
-db = new sqlite3.Database 'logit.sqlite'
+db = new sqlite3.Database 'loggit.sqlite'
 # For all these tables, (id, sequence) is unique.
 db.run "create table if not exists
-  logit_start (id, sequence, time, pid, command)", ->
+  loggit_start (id, sequence, time, pid, command)", ->
   db.run "create table if not exists
-    logit_exit (id, sequence, time, status, signal)", ->
+    loggit_exit (id, sequence, time, status, signal)", ->
     db.run "create table if not exists
-      logit_data (id, sequence, time, stream, data)", tablesCreated
+      loggit_data (id, sequence, time, stream, data)", tablesCreated
 
 tablesCreated = ->
   # Return a sequence number and timestamp for a child process.
@@ -31,19 +31,19 @@ tablesCreated = ->
       currently 4 event types identify by ev.type (start, stdout,
       stderr, exit).
 
-      Events are logged to the tables logit_start, logit_exit,
-      logit_data in the sqlite file logit.sqlite
+      Events are logged to the tables loggit_start, loggit_exit,
+      loggit_data in the sqlite file loggit.sqlite
       """
       st = stamp child
       # :todo: in future, write to some sort of DB.
       if ev.type == 'start'
-          db.run("insert into logit_start values(?, ?, ?, ?, ?)",
+          db.run("insert into loggit_start values(?, ?, ?, ?, ?)",
             [child.runid, st[0], st[1], ev.pid, ev.command_line])
       if ev.type == 'stdout' or ev.type == 'stderr'
-          db.run("insert into logit_data values(?, ?, ?, ?, ?)",
+          db.run("insert into loggit_data values(?, ?, ?, ?, ?)",
             [child.runid, st[0], st[1], ev.type, ev.data])
       if ev.type == 'exit'
-          db.run("insert into logit_exit values(?, ?, ?, ?, ?)",
+          db.run("insert into loggit_exit values(?, ?, ?, ?, ?)",
             [child.runid, st[0], st[1], ev.status, ev.signal])
 
   command = process.argv[2]
