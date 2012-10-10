@@ -37,18 +37,12 @@ tablesCreated = ->
       st = stamp(child)
       # :todo: in future, write to some sort of DB.
       if ev.type == 'start'
-          console.log st + ' pid: ' + ev.pid +
-            ' start: ' + ev.command_line
           db.run("insert into logit_start values(?, ?, ?, ?, ?)",
             [child.runid, st[0], st[1], ev.pid, ev.command_line])
       if ev.type == 'stdout' or ev.type == 'stderr'
-          console.log st + ' ' + ev.type + ': ' +
-            ev.data
           db.run("insert into logit_data values(?, ?, ?, ?, ?)",
             [child.runid, st[0], st[1], ev.type, ev.data])
       if ev.type == 'exit'
-          console.log st + ' exit status: ' + ev.status +
-            ' signal: ' + ev.signal
           db.run("insert into logit_exit values(?, ?, ?, ?, ?)",
             [child.runid, st[0], st[1], ev.status, ev.signal])
 
