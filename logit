@@ -2,42 +2,65 @@
 
 spawn = (require 'child_process').spawn
 
-# Return a sequence number and timestamp for a child process.
-# *achild.seq* is assumed to be already initialised (to 0, when
-# the process is created).
-# A list of [seq, string] is returned.
-stamp = (achild) ->
-    achild.seq += 1
-    return [achild.seq, (new Date()).toISOString()]
+sqlite3 = (require 'sqlite3').verbose()
+db = new sqlite3.Database 'logit.sqlite'
+# For all these tables, (id, sequence) is unique.
+db.run "create table if not exists
+  logit_start (id, sequence, time, pid, command)", ->
+  db.run "create table if not exists
+    logit_exit (id, sequence, time, status, signal)", ->
+    db.run "create table if not exists
+      logit_data (id, sequence, time, stream, data)", tablesCreated
 
-log = (child, ev) ->
-    """Log an event (which is a structured object).  There are
-    currently 4 type (start, stdout, stderr, exit).
-    Currently it just prints them to console.log.
-    """
-    # :todo: in future, write to some sort of DB.
-    if ev.type == 'start'
-        console.log stamp(child) + ' pid: ' + ev.pid +
-          ' start: ' + ev.command_line
-    if ev.type == 'stdout' or ev.type == 'stderr'
-        console.log stamp(child) + ' ' + ev.type + ': ' +
-          ev.data
-    if ev.type == 'exit'
-        console.log stamp(child) + ' exit status: ' + ev.status +
-          ' signal: ' + ev.signal
+tablesCreated = ->
+  # Return a sequence number and timestamp for a child process.
+  # *achild.seq* is assumed to be already initialised (to 0, when
+  # the process is created).
+  # A list of [seq, string] is returned.
+  stamp = (achild) ->
+      achild.seq += 1
+      return [achild.seq, (new Date()).toISOString()]
 
-command = process.argv[2]
-child_arguments = process.argv[3..]
-child = spawn command, child_arguments
-child.seq = 0
-log child,
-    'type': 'start'
-    pid: child.pid
-    command_line: [command].concat(child_arguments)
-          
-child.stdout.on 'data', (data) ->
-  log child, { type: 'stdout', data: data }
-child.stderr.on 'data', (data) ->
-  log child, { type: 'stderr', data: data }
-child.on 'exit', (code, signal) ->
-  log child, { type: 'exit', status: code, signal: signal }
+  log = (child, ev) ->
+      """Log an event (which is a structured object).  There are
+      currently 4 event types identify by ev.type (start, stdout,
+      stderr, exit).
+
+      Events are logged to the tables logit_start, logit_exit,
+      logit_data in the sqlite file logit.sqlite
+      """
+      st = stamp(child)
+      # :todo: in future, write to some sort of DB.
+      if ev.type == 'start'
+          console.log st + ' pid: ' + ev.pid +
+            ' start: ' + ev.command_line
+          db.run("insert into logit_start values(?, ?, ?, ?, ?)",
+            [child.runid, st[0], st[1], ev.pid, ev.command_line])
+      if ev.type == 'stdout' or ev.type == 'stderr'
+          console.log st + ' ' + ev.type + ': ' +
+            ev.data
+          db.run("insert into logit_data values(?, ?, ?, ?, ?)",
+            [child.runid, st[0], st[1], ev.type, ev.data])
+      if ev.type == 'exit'
+          console.log st + ' exit status: ' + ev.status +
+            ' signal: ' + ev.signal
+          db.run("insert into logit_exit values(?, ?, ?, ?, ?)",
+            [child.runid, st[0], st[1], ev.status, ev.signal])
+
+  command = process.argv[2]
+  child_arguments = process.argv[3..]
+  child = spawn command, child_arguments
+  child.seq = 0
+  # 128 bits of entropy.  Hopefully.
+  child.runid = (Math.random() + '' + Math.random()).replace /\./g, ''
+  log child,
+      'type': 'start'
+      pid: child.pid
+      command_line: ''+([command].concat(child_arguments))
+            
+  child.stdout.on 'data', (data) ->
+    log child, { type: 'stdout', data: data }
+  child.stderr.on 'data', (data) ->
+    log child, { type: 'stderr', data: data }
+  child.on 'exit', (code, signal) ->
+    log child, { type: 'exit', status: code, signal: signal }
