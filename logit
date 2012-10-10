@@ -50,7 +50,7 @@ tablesCreated = ->
   child_arguments = process.argv[3..]
   child = spawn command, child_arguments
   child.seq = 0
-  # 128 bits of entropy.  Hopefully.
+  # 106 (?) bits of entropy.
   child.runid = (Math.random() + '' + Math.random()).replace /\./g, ''
   log child,
       type: 'start'
