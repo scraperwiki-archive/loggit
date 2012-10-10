@@ -1,5 +1,10 @@
 #!/usr/bin/env coffee
 
+"""logit command ...
+
+Tool for logging output of a command to a sqlite database.
+"""
+
 spawn = (require 'child_process').spawn
 
 sqlite3 = (require 'sqlite3').verbose()
@@ -54,7 +59,7 @@ tablesCreated = ->
   # 128 bits of entropy.  Hopefully.
   child.runid = (Math.random() + '' + Math.random()).replace /\./g, ''
   log child,
-      'type': 'start'
+      type: 'start'
       pid: child.pid
       command_line: ''+([command].concat(child_arguments))
             
@@ -63,4 +68,5 @@ tablesCreated = ->
   child.stderr.on 'data', (data) ->
     log child, { type: 'stderr', data: data }
   child.on 'exit', (code, signal) ->
+    # :todo: could collect CPU usage here.
     log child, { type: 'exit', status: code, signal: signal }
