@@ -34,7 +34,7 @@ tablesCreated = ->
       Events are logged to the tables logit_start, logit_exit,
       logit_data in the sqlite file logit.sqlite
       """
-      st = stamp(child)
+      st = stamp child
       # :todo: in future, write to some sort of DB.
       if ev.type == 'start'
           db.run("insert into logit_start values(?, ?, ?, ?, ?)",
