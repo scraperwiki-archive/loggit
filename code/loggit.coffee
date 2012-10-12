@@ -6,17 +6,18 @@ Tool for logging output of a command to a sqlite database.
 """
 
 spawn = (require 'child_process').spawn
+
 sqlite3 = (require 'sqlite3').verbose()
+_s = require 'underscore.string'
 
 exports.createTables = (callback) ->
   db = new sqlite3.Database 'loggit.sqlite'
   # For all these tables, (id, sequence) is unique.
   db.run "create table if not exists
-    loggit_start (id, sequence, time, pid, command)", ->
+    loggit_process (runid, pid, command)", ->
     db.run "create table if not exists
-      loggit_exit (id, sequence, time, status, signal)", ->
-      db.run "create table if not exists
-        loggit_data (id, sequence, time, stream, data)", callback(db)
+      loggit_event (runid, type, time, sequence, data, exit_signal, exit_code)", ->
+        callback db
 
 exports.logMessages = (db) ->
   # Return a sequence number and timestamp for a child process.
@@ -38,14 +39,14 @@ exports.logMessages = (db) ->
       st = stamp child
       # :todo: in future, write to some sort of DB.
       if ev.type == 'start'
-          db.run("insert into loggit_start values(?, ?, ?, ?, ?)",
-            [child.runid, st[0], st[1], ev.pid, ev.command_line])
+          db.run("insert into loggit_event values(?, ?, ?, ?, NULL, NULL, NULL)",
+            [child.runid, ev.type, st[1], st[0]])
       if ev.type == 'stdout' or ev.type == 'stderr'
           db.run("insert into loggit_data values(?, ?, ?, ?, ?)",
-            [child.runid, st[0], st[1], ev.type, ev.data])
-      if ev.type == 'exit'
-          db.run("insert into loggit_exit values(?, ?, ?, ?, ?)",
-            [child.runid, st[0], st[1], ev.status, ev.signal])
+            [child.runid, ev.type, st[1], st[0], ev.type, ev.data])
+      #if ev.type == 'exit'
+      #    db.run("insert into loggit_exit values(?, ?, ?, ?, ?)",
+      #      [child.runid, st[0], st[1], ev.status, ev.signal])
 
   command = process.argv[2]
   child_arguments = process.argv[3..]
@@ -53,6 +54,7 @@ exports.logMessages = (db) ->
   child.seq = 0
   # 106 (?) bits of entropy.
   child.runid = (Math.random() + '' + Math.random()).replace /\./g, ''
+
   log child,
       type: 'start'
       pid: child.pid
@@ -66,5 +68,6 @@ exports.logMessages = (db) ->
     # :todo: could collect CPU usage here.
     log child, { type: 'exit', status: code, signal: signal }
 
-exports.Main = ->
+# START
+if _s.endsWith process.argv[1], 'loggit.coffee'
   exports.createTables( exports.logMessages )
