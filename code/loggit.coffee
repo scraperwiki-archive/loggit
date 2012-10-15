@@ -42,7 +42,7 @@ exports.logMessages = (db) ->
           db.run("insert into loggit_event values(?, ?, ?, ?, NULL, NULL, NULL)",
             [child.runid, ev.type, st[1], st[0]])
       if ev.type == 'stdout' or ev.type == 'stderr'
-          console.log ev.type
+          # console.log ev.type
           db.run("insert into loggit_event values(?, ?, ?, ?, ?, NULL, NULL)",
             [child.runid, ev.type, st[1], st[0], ev.data])
       if ev.type == 'exit'
