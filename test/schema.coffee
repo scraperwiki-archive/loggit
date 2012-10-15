@@ -36,14 +36,15 @@ describe 'Loggit', ->
   describe 'when command is run with loggit', ->
     before (done) ->
       db = new sqlite3.Database 'loggit.sqlite'
-      child_process.exec "loggit 'echo this is stderr 1>&2 && echo this is stdout'", done
+      child_process.exec "loggit {echo this is stderr 1>&2 ; echo this is stdout}", (err, stdout, stderr) ->
+        # console.log err, stdout.toString(), stderr
+        done()
 
     describe '... process ...', ->
       it 'has recorded the process', (done) ->
         db.all "select * from loggit_process", (err, rows) ->
           rows.length.should.equal 1
           done()
-
 
     describe '... events ...', ->
       it 'has recorded a start event', (done) ->

@@ -42,11 +42,12 @@ exports.logMessages = (db) ->
           db.run("insert into loggit_event values(?, ?, ?, ?, NULL, NULL, NULL)",
             [child.runid, ev.type, st[1], st[0]])
       if ev.type == 'stdout' or ev.type == 'stderr'
-          db.run("insert into loggit_data values(?, ?, ?, ?, ?)",
-            [child.runid, ev.type, st[1], st[0], ev.type, ev.data])
-      #if ev.type == 'exit'
-      #    db.run("insert into loggit_exit values(?, ?, ?, ?, ?)",
-      #      [child.runid, st[0], st[1], ev.status, ev.signal])
+          console.log ev.type
+          db.run("insert into loggit_event values(?, ?, ?, ?, ?, NULL, NULL)",
+            [child.runid, ev.type, st[1], st[0], ev.data])
+      if ev.type == 'exit'
+          db.run("insert into loggit_event values(?, ?, ?, ?, NULL, ?, ?)",
+            [child.runid, ev.type, st[1], st[0], ev.signal, ev.status])
 
   command = process.argv[2]
   child_arguments = process.argv[3..]
