@@ -1,4 +1,0 @@
-#!/bin/sh
-
-loggit echo foo
-sqlite3 'select count(*) from loggit_process'
