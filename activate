@@ -1,0 +1,2 @@
+PATH=$(pwd)/node_modules/.bin:$(pwd)/bin:$PATH
+export NODE_PATH=$(pwd)/code${NODE_PATH+:}${NODE_PATH}
