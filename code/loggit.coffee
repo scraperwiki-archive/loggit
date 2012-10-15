@@ -12,12 +12,10 @@ _s = require 'underscore.string'
 
 exports.createTables = (callback) ->
   db = new sqlite3.Database 'loggit.sqlite'
-  # For all these tables, (id, sequence) is unique.
+  # The combination of runid and sequence is unique.
   db.run "create table if not exists
-    loggit_process (runid, pid, command)", ->
-    db.run "create table if not exists
-      loggit_event (runid, type, time, sequence, data, exit_signal, exit_code)", ->
-        callback db
+    loggit_event (runid, sequence, type, time, pid, command, data, exit_signal, exit_code)", ->
+      callback db
 
 exports.logMessages = (db) ->
   # Return a sequence number and timestamp for a child process.
@@ -33,21 +31,18 @@ exports.logMessages = (db) ->
       currently 4 event types identify by ev.type (start, stdout,
       stderr, exit).
 
-      Events are logged to the tables loggit_start, loggit_exit,
-      loggit_data in the sqlite file loggit.sqlite
+      Events are logged to the loggit_event table in loggit.sqlite
       """
       st = stamp child
-      # :todo: in future, write to some sort of DB.
       if ev.type == 'start'
-          db.run("insert into loggit_event values(?, ?, ?, ?, NULL, NULL, NULL)",
-            [child.runid, ev.type, st[1], st[0]])
+          db.run("insert into loggit_event (runid, sequence, type, time, pid, command) values (?, ?, ?, ?, ?, ?)",
+            [child.runid, st[0], ev.type, st[1], child.pid, ev.command_line])
       if ev.type == 'stdout' or ev.type == 'stderr'
-          # console.log ev.type
-          db.run("insert into loggit_event values(?, ?, ?, ?, ?, NULL, NULL)",
-            [child.runid, ev.type, st[1], st[0], ev.data])
+          db.run("insert into loggit_event (runid, sequence, type, time, data) values (?, ?, ?, ?, ?)",
+            [child.runid, st[0], ev.type, st[1], ev.data])
       if ev.type == 'exit'
-          db.run("insert into loggit_event values(?, ?, ?, ?, NULL, ?, ?)",
-            [child.runid, ev.type, st[1], st[0], ev.signal, ev.status])
+          db.run("insert into loggit_event (runid, sequence, type, time, exit_signal, exit_code) values (?, ?, ?, ?, ?, ?)",
+            [child.runid, st[0], ev.type, st[1], ev.signal, ev.status])
 
   command = process.argv[2]
   child_arguments = process.argv[3..]
