@@ -14,7 +14,7 @@ exports.createTables = (callback) ->
   db = new sqlite3.Database 'loggit.sqlite'
   # The combination of runid and sequence is unique.
   db.run "create table if not exists
-    loggit_event (runid, sequence, type, time, pid, command, data, exit_signal, exit_code)", ->
+    loggit_event (runid, sequence, type, time, pid, command, data, exit_signal, exit_status)", ->
       callback db
 
 exports.logMessages = (db) ->
@@ -41,7 +41,7 @@ exports.logMessages = (db) ->
           db.run("insert into loggit_event (runid, sequence, type, time, data) values (?, ?, ?, ?, ?)",
             [child.runid, st[0], ev.type, st[1], ev.data])
       if ev.type == 'exit'
-          db.run("insert into loggit_event (runid, sequence, type, time, exit_signal, exit_code) values (?, ?, ?, ?, ?, ?)",
+          db.run("insert into loggit_event (runid, sequence, type, time, exit_signal, exit_status) values (?, ?, ?, ?, ?, ?)",
             [child.runid, st[0], ev.type, st[1], ev.signal, ev.status])
 
   command = process.argv[2]

@@ -24,7 +24,7 @@ describe 'Loggit', ->
       db.get "select * from loggit_event", done
 
     it 'should have the right columns', (done) ->
-      db.get "select runid, type, time, sequence, pid, command, data, exit_signal, exit_code from loggit_event", done
+      db.get "select runid, type, time, sequence, pid, command, data, exit_signal, exit_status from loggit_event", done
 
   describe 'when command is run with loggit', ->
 
