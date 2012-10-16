@@ -1,5 +1,12 @@
 #!/usr/bin/env coffee
 
+"""rss.coffee
+
+Command line tool to create an RSS file from the loggit.sqlite
+database.  The RSS file is written to loggit-rss.xml (it is
+created if necessary).
+"""
+
 fs = require 'fs'
 # https://github.com/dylang/node-rss
 RSS = require 'rss'
