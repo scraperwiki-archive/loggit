@@ -34,7 +34,7 @@ describe 'Loggit', ->
 
     it 'has recorded a start event', (done) ->
       db.all "select * from loggit_event where type='start'", (err, rows) ->
-        rows.length.should.not.equal 0
+        rows.length.should.equal 1
         done()
 
     it 'has recorded a stderr event', (done) ->
@@ -49,5 +49,5 @@ describe 'Loggit', ->
 
     it 'has recorded an exit event', (done) ->
       db.all "select * from loggit_event where type='exit'", (err, rows) ->
-        rows.length.should.not.equal 0
+        rows.length.should.equal 1
         done()
