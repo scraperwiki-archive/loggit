@@ -4,7 +4,6 @@
     "dependencies": {
         "sqlite3": ">0",
         "coffee-script": "1.3.2",
-        "underscore.string": ">0",
         "node-rss": "git://github.com/dylang/node-rss.git"
     },
     "devDependencies": {
