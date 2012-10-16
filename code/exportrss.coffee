@@ -18,7 +18,7 @@ sqlite3 = (require 'sqlite3').verbose()
 db = new sqlite3.Database 'loggit.sqlite'
 
 # :todo: We need to work out how to get the box name,
-# so the feed_url is correct.
+# so the feed_url is correct.  EG by running `whoami`.
 boxname = 'exampleorg/project'
 
 # :todo: Fetch description from scraperwiki.json, if it exists.
