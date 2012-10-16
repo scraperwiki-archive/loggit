@@ -8,7 +8,6 @@ Tool for logging output of a command to a sqlite database.
 spawn = (require 'child_process').spawn
 
 sqlite3 = (require 'sqlite3').verbose()
-_s = require 'underscore.string'
 
 exports.createTables = (callback) ->
   db = new sqlite3.Database 'loggit.sqlite'
@@ -65,5 +64,5 @@ exports.logMessages = (db) ->
     log child, { type: 'exit', status: code, signal: signal }
 
 # START
-if _s.endsWith process.argv[1], 'loggit.coffee'
+if process.argv[1].match /loggit\.coffee/
   exports.createTables( exports.logMessages )
