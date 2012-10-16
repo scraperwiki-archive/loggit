@@ -27,3 +27,7 @@ describe 'RSS', ->
       should.exist m
       m.length.should.equal 1
 
+    it 'should be valid'
+      # Can't work out how to install jQuery in node.js, but if we could...
+      # $.parseXML(xml)
+
