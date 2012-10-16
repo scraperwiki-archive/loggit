@@ -27,7 +27,10 @@ feed = new RSS
   author: 'The Box Author',
   feed_url: 'rss.xml'
 
-# These functions are used later, see db.each.
+# Note that Gather uses callbacks defined just after.
+Gather = (done) ->
+  db.each "select * from loggit_event where type='start'", eachRow, done
+
 eachRow = (err, row) ->
   feed.item
     title: row.command,
@@ -40,8 +43,7 @@ allDone = ->
   fs.writeFile 'loggit-rss.xml', feed.xml(), ->
 
 main = ->
-  # "loop" over data and add to feed
-  db.each "select * from loggit_event where type='start'", eachRow, allDone
+  Gather allDone
 
 # START
 if process.argv[1].match /rss\.coffee$/
