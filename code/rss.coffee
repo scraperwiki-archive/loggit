@@ -39,5 +39,10 @@ eachRow = (err, row) ->
 allDone = ->
   fs.writeFile 'loggit-rss.xml', feed.xml(), ->
 
-# "loop" over data and add to feed
-db.each "select * from loggit_event where type='start'", eachRow, allDone
+main = ->
+  # "loop" over data and add to feed
+  db.each "select * from loggit_event where type='start'", eachRow, allDone
+
+# START
+if process.argv[1].match /rss\.coffee$/
+  main()
