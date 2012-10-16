@@ -16,6 +16,10 @@ db = new sqlite3.Database 'loggit.sqlite'
 
 # :todo: We need to work out how to get the box name,
 # so the feed_url is correct.
+boxname = 'exampleorg/project'
+
+# :todo: Fetch description from scraperwiki.json, if it exists.
+
 feed = new RSS
   title: 'loggit RSS feed',
   site_url: 'overview/',
@@ -27,7 +31,7 @@ feed = new RSS
 eachRow = (err, row) ->
   feed.item
     title: row.command,
-    url: 'http://api/sqlite?q=select*from+loggit_event+where+runid='+row.runid,
+    url: 'http://box.scraperwiki.com/'+boxname+'/sqlite?q=select*from+loggit_event+where+runid='+row.runid,
     date: row.timestamp,
     description: 'do not have one',
     guid: row.runid
