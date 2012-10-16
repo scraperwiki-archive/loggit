@@ -7,6 +7,9 @@ database.  The RSS file is written to loggit-rss.xml (it is
 created if necessary).
 """
 
+# The exports in this file, are only there so that they can be
+# exported to the script that tests them.
+
 fs = require 'fs'
 # https://github.com/dylang/node-rss
 RSS = require 'rss'
@@ -26,10 +29,12 @@ feed = new RSS
   description: "Stuff from the loggit runs",
   author: 'The Box Author',
   feed_url: 'rss.xml'
+exports.feed = feed
 
 # Note that Gather uses callbacks defined just after.
-Gather = (done) ->
+exports.Gather = (done) ->
   db.each "select * from loggit_event where type='start'", eachRow, done
+Gather = exports.Gather
 
 eachRow = (err, row) ->
   feed.item
