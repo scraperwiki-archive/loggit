@@ -1,6 +1,6 @@
 # loggit #
 
-A tool to log what a command does to an SQLite database.
+A tool to log a command's activity to an SQLite database.
 
 Prefixing your normal commands with `loggit` will capture:
 * stdout and stderr 
@@ -19,14 +19,16 @@ For convenience, Loggit also comes with an RSS generator, `exportrss`, that turn
 
 ## Example: command line ##
 
-    loggit setup.py
+    loggit ls -hitlr foo .
     sqlite3 loggit.sqlite 'select * from loggit_event order by time desc limit 5'
     exportrss
     cat loggit-rss.xml
+
+Of course `ls -hitlr foo .` is just an example command, you can run any command using `loggit`.
     
 ## Example: crontab ##
 
-    @daily cd loggit; loggit setup.py; exportrss
+    @daily cd loggit; loggit scrape.py; exportrss
 
 ## Running the tests ##
 
