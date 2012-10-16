@@ -9,8 +9,8 @@ loggit = require 'loggit'
 describe 'Loggit', ->
   db = null
 
-  after (done) ->
-    fs.unlink 'loggit.sqlite', (err) ->
+  before (done) ->
+    fs.rename 'loggit.sqlite', 'loggit-backup.sqlite', (err) ->
       done()
 
   describe 'database schema', ->
