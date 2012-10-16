@@ -8,7 +8,7 @@
     },
     "devDependencies": {
         "mocha": ">=0.4.1",
-        "xmldom": "git://github.com/jindw/xmldom.git",
+        "xmldom": ">=0.1",
         "should": ">0"
     }
 }
