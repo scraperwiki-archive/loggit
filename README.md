@@ -16,6 +16,7 @@ For convenience, Loggit also comes with an RSS generator, `exportrss`, that turn
     git clone git://github.com/scraperwiki/loggit.git
     cd loggit
     npm install
+    . activate
 
 ## Example: command line ##
 
