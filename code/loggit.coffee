@@ -64,5 +64,5 @@ exports.logMessages = (db) ->
     log child, { type: 'exit', status: code, signal: signal }
 
 # START
-if process.argv[1].match /loggit\.coffee/
+if process.argv[1].match /loggit\.coffee$/
   exports.createTables( exports.logMessages )
