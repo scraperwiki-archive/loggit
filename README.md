@@ -1,6 +1,6 @@
 # loggit #
 
-A tool to log a command's activity to an SQLite database.
+A tool to log a command's activity to a SQLite database.
 
 Prefixing your normal commands with `loggit` will capture:
 * stdout and stderr 
