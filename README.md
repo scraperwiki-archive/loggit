@@ -13,7 +13,7 @@ For convenience, Loggit also comes with an RSS generator, `exportrss`, that turn
 
 ## Setup ##
 
-    git clone git@github.com:scraperwiki/loggit.git
+    git clone git://github.com/scraperwiki/loggit.git
     cd loggit
     npm install
 
