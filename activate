@@ -1,2 +1,14 @@
+if [ "$(basename "$(pwd)")" != loggit ]
+then
+  if !(cd loggit)
+  then
+    echo 1>&2 'run ". activate" from the loggit directory; or its parent.'
+    exit 4
+  fi
+  pwd () (
+    cd loggit
+    env pwd
+  )
+fi
 PATH=$(pwd)/node_modules/.bin:$(pwd)/bin:$PATH
 export NODE_PATH=$(pwd)/code${NODE_PATH+:}${NODE_PATH}
