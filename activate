@@ -1,3 +1,10 @@
+# Source me with
+# . activate
+
+loggit_pwd () {
+  pwd
+}
+
 if [ "$(basename "$(pwd)")" != loggit ]
 then
   if !(cd loggit)
@@ -5,10 +12,11 @@ then
     echo 1>&2 'run ". activate" from the loggit directory; or its parent.'
     exit 4
   fi
-  pwd () (
+  loggit_pwd () (
     cd loggit
     env pwd
   )
 fi
-PATH=$(pwd)/node_modules/.bin:$(pwd)/bin:$PATH
-export NODE_PATH=$(pwd)/code${NODE_PATH+:}${NODE_PATH}
+PATH=$(loggit_pwd)/node_modules/.bin:$(loggit_pwd)/bin:$PATH
+export NODE_PATH=$(loggit_pwd)/code${NODE_PATH+:}${NODE_PATH}
+unset -f loggit_pwd
