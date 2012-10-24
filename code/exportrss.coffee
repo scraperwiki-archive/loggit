@@ -14,9 +14,10 @@ created if necessary).
 fs = require 'fs'
 # https://github.com/dylang/node-rss
 RSS = require 'rss'
-
 sqlite3 = (require 'sqlite3').verbose()
-db = new sqlite3.Database 'loggit.sqlite'
+
+settings = JSON.parse (fs.readFileSync 'scraperwiki.json')
+db = new sqlite3.Database settings.database
 
 child_process = require 'child_process'
 
@@ -29,17 +30,18 @@ if process.argv[2]
 else
   filename = 'loggit-rss.xml'
 
+
 # Note that Gather uses callbacks defined just after.
 exports.Gather = (done) ->
   child_process.exec 'whoami', (err, stdout, stderr) ->
     boxname = stdout.toString().replace(/\s/g, '').replace('.','/')
     # :todo: this ignores the fact there might be a publish_token set.
-    boxurl = 'https://box.scraperwiki.com/' + boxname + '/'
+    boxurl = 'https://box.scraperwiki.com/' + boxname + '/' + settings.publish_token + '/'
     feed = new RSS
-      title: 'loggit RSS feed',
+      title: 'loggit events - ' + boxname,
       site_url: boxurl + 'http/',
       description: "Stuff from the loggit runs",
-      author: 'The Box Author',
+      author: boxname.split('/')[0],
       feed_url: boxurl + 'http/' + filename
     exports.feed = feed
     db.each "select * from loggit_event where type='start'", eachRow, done
@@ -49,8 +51,8 @@ eachRow = (err, row) ->
   feed.item
     title: row.command,
     url: boxurl + 'sqlite?q=select*from+loggit_event+where+runid='+row.runid,
-    date: row.timestamp,
-    description: 'do not have one',
+    date: row.time,
+    description: 'do not have one'
     guid: row.runid
 
 allDone = ->

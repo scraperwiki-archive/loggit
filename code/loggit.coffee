@@ -10,7 +10,7 @@ spawn = (require 'child_process').spawn
 sqlite3 = (require 'sqlite3').verbose()
 
 exports.createTables = (callback) ->
-  db = new sqlite3.Database 'loggit.sqlite'
+  db = new sqlite3.Database 'scraperwiki.sqlite'
   # The combination of runid and sequence is unique.
   db.run "create table if not exists
     loggit_event (runid, sequence, type, time, pid, command, data, exit_signal, exit_status)", ->
