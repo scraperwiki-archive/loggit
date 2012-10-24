@@ -24,7 +24,10 @@ feed = null
 boxname = null
 boxurl = null
 
-filename = 'loggit-rss.xml'
+if process.argv[2]
+  filename = process.argv[2]
+else
+  filename = 'loggit-rss.xml'
 
 # Note that Gather uses callbacks defined just after.
 exports.Gather = (done) ->
@@ -51,7 +54,8 @@ eachRow = (err, row) ->
     guid: row.runid
 
 allDone = ->
-  fs.writeFile filename, feed.xml(), ->
+  fs.writeFile filename, feed.xml(), (error, result) ->
+    if error then console.log error
 
 main = ->
   Gather allDone
