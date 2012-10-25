@@ -21,11 +21,12 @@ For convenience, Loggit also comes with an RSS generator, `exportrss`, that turn
 ## Example: command line ##
 
     loggit ls -hitlr foo .
-    sqlite3 loggit.sqlite 'select * from loggit_event order by time desc limit 5'
+    sqlite3 scraperwiki.sqlite 'select * from loggit_event order by time desc limit 5'
     exportrss
     cat loggit-rss.xml
 
 Of course `ls -hitlr foo .` is just an example command, you can run any command using `loggit`.
+The example assumes your database is the default `scraperwiki.sqlite`.
     
 ## Example: crontab ##
 
