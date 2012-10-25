@@ -440,6 +440,7 @@ sub process_command {
     push @command, " (Do you really mean to run a null command?)";
   }
   print STDERR $command[0],"\n";
+  system($command[0]);
   $command[0] = "Run: $command[0]";
   
   if($filter) {

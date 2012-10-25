@@ -6,7 +6,7 @@ Tool for logging output of a command to a sqlite database.
 """
 
 spawn = (require 'child_process').spawn
-
+fs = (require 'fs')
 sqlite3 = (require 'sqlite3').verbose()
 
 settings = JSON.parse (fs.readFileSync 'scraperwiki.json')
@@ -49,8 +49,8 @@ exports.logMessages = (db) ->
   child_arguments = process.argv[3..]
   child = spawn command, child_arguments
   child.seq = 0
-  # 106 (?) bits of entropy.
-  child.runid = (Math.random() + '' + Math.random()).replace /\./g, ''
+  # 53 (?) bits of entropy from Math.random(). (Maybe. Possibly seeded from clock?)
+  child.runid = (new Date().toISOString() + Math.random()).replace /\./g, ''
 
   log child,
       type: 'start'
