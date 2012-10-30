@@ -45,11 +45,11 @@ Everything is in the `loggit_event` table.
 `sequence`: events happen in order. runid+sequence is unique.
 `type`: one of `start`, `stdout`, `stderr`, `exit`
 `time`: the time that the event was recorded by loggit, in ISO 8601 format.  The system clock is used.  Generally the child process will buffer its output which means that the time that loggit sees the output will not be exactly the same time that the command wrote it.  Additionally, with lots of rapid output, it may be possible to get more than one event with exactly the same timestamp (use `sequence` to make them unique).
-`pid` [*start only*]: pid number of the command
-`command` [*start only*]: command line invoked
-`data` [*stdout, stderr*]: text output from the command. Concatenate in order.
-`exit_status` [*exit only*]: the exit status ($? in shell) of the completed command. Not used if exited with a signal, see `exit_signal`.
-`exit_signal` [*exit only*]: the signal that killed the command, if any.  Not used for normal command completion.
+`pid` [start only]: pid number of the command
+`command` [start only]: command line invoked
+`data` [stdout, stderr]: text output from the command. Concatenate in order.
+`exit_status` [exit only]: the exit status ($? in shell) of the completed command. Not used if exited with a signal, see `exit_signal`.
+`exit_signal` [exit only]: the signal that killed the command, if any.  Not used for normal command completion.
 
 # useful SQL
 
