@@ -10,7 +10,7 @@ describe 'Loggit', ->
   db = null
 
   before (done) ->
-    fs.rename 'loggit.sqlite', 'loggit-backup.sqlite', (err) ->
+    fs.rename 'test.sqlite', 'test-old.sqlite', (err) ->
       done()
 
   describe 'database schema', ->
@@ -29,7 +29,7 @@ describe 'Loggit', ->
   describe 'when command is run with loggit', ->
 
     before (done) ->
-      db = new sqlite3.Database 'loggit.sqlite'
+      db = new sqlite3.Database 'test.sqlite'
       child_process.exec "bin/loggit sh -c '{echo this is stderr 1>&2 ; echo this is stdout}'", done
 
     it 'has recorded a start event', (done) ->
