@@ -40,7 +40,7 @@ exports.logMessages = (db) ->
             [child.runid, st[0], ev.type, st[1], child.pid, ev.command_line])
       if ev.type == 'stdout' or ev.type == 'stderr'
           db.run("insert into loggit_event (runid, sequence, type, time, data) values (?, ?, ?, ?, ?)",
-            [child.runid, st[0], ev.type, st[1], ev.data])
+            [child.runid, st[0], ev.type, st[1], ev.data.toString()])
       if ev.type == 'exit'
           db.run("insert into loggit_event (runid, sequence, type, time, exit_signal, exit_status) values (?, ?, ?, ?, ?, ?)",
             [child.runid, st[0], ev.type, st[1], ev.signal, ev.status])

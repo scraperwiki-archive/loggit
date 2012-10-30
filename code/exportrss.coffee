@@ -50,7 +50,7 @@ Gather = exports.Gather
 eachRow = (err, row) ->
   feed.item
     title: row.command,
-    url: boxurl + 'sqlite?q=select*from+loggit_event+where+runid='+row.runid,
+    url: boxurl + 'sqlite?q=select*from+loggit_event+where+runid="'+row.runid+'"',
     date: row.time,
     description: 'do not have one'
     guid: row.runid
