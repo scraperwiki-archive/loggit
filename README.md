@@ -34,6 +34,7 @@ The example assumes your database is the default `scraperwiki.sqlite`.
 
 ## Running the tests ##
 
+    # From the top-level directory "loggit"
     . activate
     mocha
 
@@ -43,17 +44,17 @@ Everything is in the `loggit_event` table.
 `runid`: unique to each run.
 `sequence`: events happen in order. runid+sequence is unique.
 `type`: one of `start`, `stdout`, `stderr`, `exit`
-`time`: a time. (TODO: is it the same for each event?)
+`time`: the time that the event was recorded by loggit, in ISO 8601 format.  The system clock is used.  Generally the child process will buffer its output which means that the time that loggit sees the output will not be exactly the same time that the command wrote it.  Additionally, with lots of rapid output, it may be possible to get more than one event with exactly the same timestamp (use `sequence` to make them unique).
 `pid` [*start only*]: pid number of the command
 `command` [*start only*]: command line invoked
 `data` [*stdout, stderr*]: text output from the command. Concatenate in order.
-`exit_signal` [*exit only*]: status signal. (TODO: how does this relate to `exit_status`)?
-`exit_status` [*exit only*]: the return value from the command. (one or other w/signal?)
+`exit_status` [*exit only*]: the exit status ($? in shell) of the completed command. Not used if exited with a signal, see `exit_signal`.
+`exit_signal` [*exit only*]: the signal that killed the command, if any.  Not used for normal command completion.
 
 # useful SQL
 
-select start.runid as runid, start.time, exit.time, start.pid as pid, start.command as command, exit.exit_signal as exit_signal, exit.exit_status as exit_status from (select * from loggit_event where runid = "0389088658383116102947926400229335" and type = "start") as start left join (select * from loggit_event where runid = "0389088658383116102947926400229335" and type = "exit") as exit ;
+    select start.runid as runid, start.time, exit.time, start.pid as pid, start.command as command, exit.exit_signal as exit_signal, exit.exit_status as exit_status from (select * from loggit_event where runid = "0389088658383116102947926400229335" and type = "start") as start left join (select * from loggit_event where runid = "0389088658383116102947926400229335" and type = "exit") as exit ;
 
-select runid , group_concat (data,'') from loggit_event where type = "stdout" or type = "stderr" group by runid;
+    select runid , group_concat (data,'') from loggit_event where type = "stdout" or type = "stderr" group by runid;
 
 
