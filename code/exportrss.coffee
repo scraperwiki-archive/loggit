@@ -45,15 +45,33 @@ exports.Gather = (done) ->
       feed_url: boxurl + 'http/' + filename
     exports.feed = feed
     # db.each "select * from loggit_event where type='start'", eachRow, done
-    db.each 'select start.runid as runid, start.time as start_time, exit.time as exit_time, start.pid as pid, start.command as command, exit.exit_signal as exit_signal, exit.exit_status as exit_status from (select * from loggit_event where type = "start") as start left join (select * from loggit_event where type = "exit") as exit on start.runid==exit.runid;', eachRow, done
+    db.each """
+      select 
+      start.runid as runid, start.time as start_time, exit.time as exit_time, start.pid as pid,
+      start.command as command, exit.exit_signal as exit_signal, exit.exit_status as exit_status
+      from 
+        (select * from loggit_event where type = "start") as start
+        left join 
+        (select * from loggit_event where type = "exit") as exit
+        on start.runid==exit.runid
+      order by start_time desc;""", eachRow, done
+
 Gather = exports.Gather
+
+exitMsg = (row) ->
+  signal = row.exit_signal || ""
+  if row.exit_status?
+    status = row.exit_status
+  else
+    status = ""
+  return signal+status
 
 eachRow = (err, row) ->
   feed.item
     title: row.command,
     url: boxurl + 'sqlite?q=select*from+loggit_event+where+runid="'+row.runid+'"',
     date: row.start_time,
-    description: "Exit: "+row.exit_signal+row.exit_status
+    description: "Exit: "+exitMsg(row)
     guid: row.runid
 
 allDone = ->
