@@ -27,7 +27,7 @@ entityEscape = (text) ->
   return text
 
 settings = JSON.parse (fs.readFileSync 'scraperwiki.json')
-db = new sqlite3.Database settings.database
+db = new sqlite3.Database (settings.loggit?.database || settings.database)
 
 child_process = require 'child_process'
 

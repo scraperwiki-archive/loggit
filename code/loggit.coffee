@@ -12,7 +12,7 @@ sqlite3 = (require 'sqlite3').verbose()
 settings = JSON.parse (fs.readFileSync 'scraperwiki.json')
 
 exports.createTables = (callback) ->
-  db = new sqlite3.Database settings.database
+  db = new sqlite3.Database (settings.loggit?.database || settings.database)
   # The combination of runid and sequence is unique.
   db.run "create table if not exists
     loggit_event (runid, sequence, type, time, pid, command, data, exit_signal, exit_status)", ->
