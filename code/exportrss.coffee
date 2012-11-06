@@ -12,9 +12,11 @@ created if necessary).
 # exported to the script that tests them.
 
 fs = require 'fs'
+
 # https://github.com/dylang/node-rss
 RSS = require 'rss'
 sqlite3 = (require 'sqlite3').verbose()
+async = require 'async'
 
 settings = JSON.parse (fs.readFileSync 'scraperwiki.json')
 db = new sqlite3.Database settings.database
@@ -66,17 +68,36 @@ exitMsg = (row) ->
     status = ""
   return signal+status
 
+getOutput = (runid, callback) ->
+  db.all """
+  select group_concat (data,'') as output
+  from loggit_event
+  where (type = "stdout" or type = "stderr") 
+    and runid=?;
+  """, [runid], (err, rows) ->
+    callback rows[0].output
+
+items = []
 eachRow = (err, row) ->
-  feed.item
+  items.push
     title: '['+exitMsg(row)+'] '+row.command,
     url: boxurl + 'sqlite?q=select*from+loggit_event+where+runid="'+row.runid+'"',
     date: row.start_time,
+    # Will append output to description in allDone()
     description: "Exit: "+exitMsg(row)
     guid: row.runid
-
+  
 allDone = ->
-  fs.writeFile filename, feed.xml(), (error, result) ->
-    if error then console.log error
+  each = (item, callback) ->
+    # Note: item.guid is the runid.
+    getOutput item.guid, (output) ->
+      item.description += "<pre>#{output}</pre>"
+      feed.item item
+      callback null, null
+  done = (resultList_) ->
+    fs.writeFile filename, feed.xml(), (error, result) ->
+      if error then console.log error
+  async.mapSeries items, each, done
 
 main = ->
   Gather allDone
