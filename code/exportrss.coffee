@@ -77,22 +77,30 @@ exitMsg = (row) ->
   return signal+status
 
 getOutput = (runid, callback) ->
+  # The order of group_concat is allegedly arbitary. In practice it's what you give it... we think.
   db.all """
   select group_concat (data,'') as output
-  from loggit_event
-  where (type = "stdout" or type = "stderr") 
-    and runid=?;
-  """, [runid], (err, rows) ->
-    callback rows[0].output
+  from
+    (select data 
+     from loggit_event
+     where (type = "stdout" or type = "stderr") 
+     and runid=?
+     order by sequence asc);
+  """, [runid], (err, rows) -> 
+    callback rows[0].output 
 
 items = []
 eachRow = (err, row) ->
+  duration=(Date.parse row.exit_time) - (Date.parse row.start_time)
+  duration/=1000
   items.push
     title: '['+exitMsg(row)+'] '+row.command,
     url: boxurl + 'sqlite?q=select*from+loggit_event+where+runid="'+row.runid+'"',
     date: row.start_time,
     # Will append output to description in allDone()
-    description: "Exit: "+exitMsg(row)
+    description: """Exit: #{exitMsg(row)}<br>
+                    Duration: #{duration} seconds<br>
+                    #{row.start_time} - #{row.exit_time}"""
     guid: row.runid
   
 allDone = ->

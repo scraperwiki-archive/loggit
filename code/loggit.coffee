@@ -16,7 +16,9 @@ exports.createTables = (callback) ->
   # The combination of runid and sequence is unique.
   db.run "create table if not exists
     loggit_event (runid, sequence, type, time, pid, command, data, exit_signal, exit_status)", ->
-      callback db
+      db.run "create index if not exists loggit_time_index on loggit_event (time)", ->
+      db.run "create index if not exists loggit_index on loggit_event (runid, sequence)", ->
+        callback db
 
 exports.logMessages = (db) ->
   # Return a sequence number and timestamp for a child process.
