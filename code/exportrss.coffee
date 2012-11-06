@@ -68,7 +68,7 @@ exitMsg = (row) ->
 
 eachRow = (err, row) ->
   feed.item
-    title: row.command,
+    title: '['+exitMsg(row)+'] '+row.command,
     url: boxurl + 'sqlite?q=select*from+loggit_event+where+runid="'+row.runid+'"',
     date: row.start_time,
     description: "Exit: "+exitMsg(row)
