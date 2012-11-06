@@ -18,6 +18,14 @@ RSS = require 'rss'
 sqlite3 = (require 'sqlite3').verbose()
 async = require 'async'
 
+# I can't believe we have to write this function that
+# escapes '<' and '&'
+entityEscape = (text) ->
+  # the order matters.  & first.
+  text = text.replace /&/g, "&amp;"
+  text = text.replace /</g, "&lt;"
+  return text
+
 settings = JSON.parse (fs.readFileSync 'scraperwiki.json')
 db = new sqlite3.Database settings.database
 
@@ -91,7 +99,8 @@ allDone = ->
   each = (item, callback) ->
     # Note: item.guid is the runid.
     getOutput item.guid, (output) ->
-      item.description += "<pre>#{output}</pre>"
+      output = '' if not output?
+      item.description += "<pre>#{entityEscape(output)}</pre>"
       feed.item item
       callback null, null
   done = (resultList_) ->
